@@ -1,10 +1,13 @@
 const passport = require('passport')
+const jwt = require('jsonwebtoken')
 const LocalStrategy = require('passport-local').Strategy
 const TwitterStrategy = require('passport-twitter').Strategy
 const FacebookStrategy = require('passport-facebook').Strategy
 const GoogleStrategy = require('passport-google-oauth').Strategy
+require('dotenv').config()
 
 const User = require('../models/user')
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'ThisIsNotProdDontWorryAboutIt'
 
 passport.serializeUser(function(user, done) {
     done(null, user.id)
@@ -53,12 +56,12 @@ passport.use('local-login', new LocalStrategy({
     })
 }))
 
-exports.isAuthenticated = (req, res, next) => {
-    if (req.isAuthenticated()) {
-      return next()
-    }
-    res.status(401).json('You must be logged in to do that.')
-  }
+// exports.isAuthenticated = (req, res, next) => {
+//     if (req.isAuthenticated()) {
+//       return next()
+//     }
+//     res.status(401).json('You must be logged in to do that.')
+//   }
 
 const createUserWithPrefs = async (username, password) => { // This will eventually need modified for all the social logins....
     let newUser = new User()

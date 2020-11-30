@@ -1,10 +1,7 @@
 const mongoose = require('mongoose')
 const argon2 = require('argon2')
-// TODO add referrer
-// TODO add role
-// TODO add email and phone but only require one
-
 // define the schema for our user model
+// TODO Add objects for other social signins
 const userSchema = mongoose.Schema({
 
     local            : {
@@ -28,7 +25,9 @@ const userSchema = mongoose.Schema({
         token        : String,
         email        : String,
         name         : String
-    }
+    },
+    referrer         : String,
+    role             : String
 
 })
 
