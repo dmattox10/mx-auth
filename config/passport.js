@@ -1,23 +1,25 @@
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const LocalStrategy = require('passport-local').Strategy
-const TwitterStrategy = require('passport-twitter').Strategy
+
 const FacebookStrategy = require('passport-facebook').Strategy
 const GoogleStrategy = require('passport-google-oauth').Strategy
+const TwitterStrategy = require('passport-twitter').Strategy
+
 require('dotenv').config()
 
 const User = require('../models/user')
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'ThisIsNotProdDontWorryAboutIt'
 
-passport.serializeUser(function(user, done) {
-    done(null, user.id)
-})
+// passport.serializeUser(function(user, done) {
+//     done(null, user.id)
+// })
     
-passport.deserializeUser(function(id, done) {
-    User.findById(id, function(err, user) {
-    done(err, user)
-    })
-})
+// passport.deserializeUser(function(id, done) {
+//     User.findById(id, function(err, user) {
+//     done(err, user)
+//     })
+// })
 
 passport.use('local-signup', new LocalStrategy({
     usernameField: 'username',
@@ -40,6 +42,7 @@ passport.use('local-signup', new LocalStrategy({
         })
     })
 }))
+
 passport.use('local-login', new LocalStrategy({
     usernameField: 'username',
     passwordField: 'password',
@@ -54,6 +57,32 @@ passport.use('local-login', new LocalStrategy({
             return done(null, false)
         return done(null, user)
     })
+}))
+
+passport.use('facebook', new FacebookStrategy({
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: '/v1/auth/facebook/callback'
+},
+(accessToken, refreshToken, profile, cb) => {
+    User.findOrCreate({
+        'facebook.id': profile.id
+    }, {
+        'facebook.token': profile.token,
+        'facebook.name': profile.name,
+        'facebook.email': profile.email,
+
+    }, (err, user) => {
+        return cb(err, user)
+    })
+}))
+
+passport.use('google', new GoogleStrategy({
+
+}))
+
+passport.use('twitter', new TwitterStrategy({
+
 }))
 
 // exports.isAuthenticated = (req, res, next) => {

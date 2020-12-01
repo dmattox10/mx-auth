@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 const argon2 = require('argon2')
+const findOrCreate = require('mongoose-findorcreate')
+
 // define the schema for our user model
 // TODO Add objects for other social signins
 const userSchema = mongoose.Schema({
@@ -32,6 +34,9 @@ const userSchema = mongoose.Schema({
 })
 
 // generating a hash
+
+userSchema.plugin(findOrCreate)
+
 userSchema.methods.generateHash = async password => {
     const hash = await argon2.hash(password)
     return hash

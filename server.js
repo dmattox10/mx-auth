@@ -7,10 +7,11 @@ const bodyParser = require('body-parser')
 const passport = require('passport')
 const flash = require('connect-flash')
 
-// const statsRouter = require('./routes/statsRouter')
+const authRouter = require('./routes/authRouter')
+const statsRouter = require('./routes/statsRouter')
 require('dotenv').config()
 
-const passportConfig = require('./config/passport')
+// const passportConfig = require('./config/passport')
 const app = express()
 connectDB()
 
@@ -38,9 +39,9 @@ app.use(passport.initialize())
 app.use(flash())
 
 
-// app.use('/v1/user/auth', userRouter)
+app.use('/v1/auth', authRouter)
 // app.use('/v1/user/dashboard', passportConfig.isAuthenticated, dashRouter)
-// app.use('/stats', statsRoute)
+app.use('/stats', statsRouter)
 
 app.get('/', (req, res) => {
     res.send('<h2>“The code is more what you’d call ‘guidelines’ than actual rules.” – Hector Barbossa</h2>')
