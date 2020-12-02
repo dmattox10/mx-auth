@@ -28,7 +28,12 @@ const userSchema = mongoose.Schema({
         email        : String,
         name         : String
     },
-    referrer         : String,
+    github           : {
+        id           : String,
+        token        : String
+    },
+    referrers        : Array,
+    method           : String,
     role             : String
 
 })
