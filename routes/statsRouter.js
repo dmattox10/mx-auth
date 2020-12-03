@@ -15,7 +15,7 @@ const bruteforce = new ExpressBrute(store)
 const statsRouter = express.Router()
 
 statsRouter.get('/', Cors(), bruteforce.prevent, async (req, res) => {
-    // Load from flat file here!
+    // TODO Load from flat file here!
     res.status(200).json()
 })
 

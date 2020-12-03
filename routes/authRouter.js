@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const Cors = require('cors')
 const ExpressBrute = require('express-brute')
 
-const authRouter = express.Router({ mergeParams: true })
+const authRouter = express.Router({ mergeParams: true }) 
 const store = new ExpressBrute.MemoryStore()
 const bruteforce = new ExpressBrute(store)
 
