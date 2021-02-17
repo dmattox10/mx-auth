@@ -8,8 +8,7 @@ const authRouter = express.Router({ mergeParams: true })
 const store = new ExpressBrute.MemoryStore()
 const bruteforce = new ExpressBrute(store)
 
-const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'ThisIsNotProdDontWorryAboutIt'
-
+const { SHARED_SECRET } = require('../env')
 const User = require('../models/user')
 const Portal = require('../models/portal')
 
@@ -113,7 +112,7 @@ authRouter.get('/twitter/callback', Cors(), bruteforce.prevent, passport.authent
 })
 
 const sign = user => {
-    jwt.sign(user, accessTokenSecret, {
+    jwt.sign(user, SHARED_SECRET, {
         expiresIn: 3600
     }, (err, token) => {
         if (err) {

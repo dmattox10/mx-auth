@@ -9,14 +9,26 @@ const GitHubStrategy = require('passport-github2').Strategy
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 const TwitterStrategy = require('passport-twitter').Strategy
 
+const { 
+    SHARED_SECRET,
+    FACEBOOK_APP_ID,
+    FACEBOOK_APP_SECRET,
+    GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET,
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    TWITTER_CONSUMER_KEY,
+    TWITTER_CONSUMER_SECRET,
+} = require('../env')
+
 require('dotenv').config()
 
 const User = require('../models/user')
 
-const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'ThisIsNotProdDontWorryAboutIt'
+// const accessTokenSecret = SHARED_SECRET || 'ThisIsNotProdDontWorryAboutIt'
 const opts = {
     jwtFromRequest: ExtractJWT.fromAuthHeaderWithScheme('JWT'),
-    secretOrKey: accessTokenSecret
+    secretOrKey: SHARED_SECRET || 'ThisIsNotProdDontWorryAboutIt'
 }
 
 // passport.serializeUser(function(user, done) {
@@ -79,8 +91,8 @@ passport.use('jwt', new JWTStrategy(opts, (jwt_payload, done) => {
 }))
 
 passport.use('facebook', new FacebookStrategy({
-    clientID: process.env.FACEBOOK_APP_ID,
-    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    clientID: FACEBOOK_APP_ID,
+    clientSecret: FACEBOOK_APP_SECRET,
     callbackURL: '/v1/auth/facebook/callback' // May need full URL
 }, (accessToken, refreshToken, profile, cb) => {
     User.findOrCreate({
@@ -97,8 +109,8 @@ passport.use('facebook', new FacebookStrategy({
 }))
 
 passport.use('github', new GitHubStrategy({
-    clientID: process.env.GITHUB_CLIENT_ID,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    clientID: GITHUB_CLIENT_ID,
+    clientSecret: GITHUB_CLIENT_SECRET,
     callbackURL: '/v1/auth/github/callback'
 }, (accessToken, refreshToken, profile, done) => {
     User.findOrCreate({
@@ -112,8 +124,8 @@ passport.use('github', new GitHubStrategy({
 }))
 
 passport.use('google', new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
     callbackURL: '/v1/auth/google/callback' // May need full URL
 }, (accessToken, refreshToken, profile, cb) => {
     User.findOrCreate({
@@ -130,8 +142,8 @@ passport.use('google', new GoogleStrategy({
 }))
 
 passport.use('twitter', new TwitterStrategy({
-    consumerKey: process.env.TWITTER_CONSUMER_KEY,
-    consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+    consumerKey: TWITTER_CONSUMER_KEY,
+    consumerSecret: TWITTER_CONSUMER_SECRET,
     callbackURL: '/v1/auth/twitter/callback' // May need full URL
 }, (token, tokenSecret, profile, cb) => {
     User.findOrCreate({
