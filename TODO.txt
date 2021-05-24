@@ -1,0 +1,3 @@
+Create home page for auth
+create /privacy route with info
+create /tos route with info
