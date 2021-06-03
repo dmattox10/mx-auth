@@ -12,6 +12,7 @@ const localdb = require('./tools/localdb')
 
 const authRouter = require('./routes/authRouter')
 const statsRouter = require('./routes/statsRouter')
+const { APP_PORT } = require("./env")
 require('dotenv').config()
 
 // const passportConfig = require('./config/passport')
@@ -58,5 +59,5 @@ app.get('/', (req, res) => {
 })
 
 job.start()
-const PORT = 5959 || process.env.PORT
+const PORT = APP_PORT || 5050
 app.listen(PORT, () => console.log(`'Ello ${PORT}.`))

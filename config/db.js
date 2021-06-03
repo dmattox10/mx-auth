@@ -3,7 +3,7 @@ const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
 const adapter = new FileSync('db.json')
 const localdb = require('../tools/localdb')
-require('dotenv').config()
+const { MONGO_URI } = require('../env')
 
 const db = low(adapter)
 
@@ -13,7 +13,7 @@ db.defaults({ service: {} }).write()
 // TODO add retry connect
 const connectDB = async () => {
     try{
-        await mongoose.connect(process.env.MONGO_URI)
+        await mongoose.connect(MONGO_URI)
         console.log("Connected to DB")
         localdb.update()
     }catch(err){
