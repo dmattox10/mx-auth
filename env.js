@@ -12,6 +12,7 @@ const {
 
     const ENVIRONMENT = process.env
     let MONGO_URI = ''
+    console.log(ENVIRONMENT)
     if (ENVIRONMENT === 'testing') {
         MONGO_URI = 'mongodb://mongo:27017/auth'
     } else if (ENVIRONMENT === 'prod') {   
