@@ -10,4 +10,4 @@ const update = async () => {
     db.set('service.portals', portalsList).write() // This probably needs promisified
 }
 
-module.exports = update
+module.exports = { update }
