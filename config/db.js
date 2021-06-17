@@ -5,6 +5,8 @@ const adapter = new FileSync('db.json')
 const localdb = require('../tools/localdb')
 const { MONGO_URI } = require('../env')
 
+const { ENVIRONMENT } = process.env
+
 const db = low(adapter)
 
 db.defaults({ service: {} }).write()
@@ -13,7 +15,7 @@ db.defaults({ service: {} }).write()
 // TODO add retry connect
 const connectDB = async () => {
     try{
-        await mongoose.connect(MONGO_URI)
+        await mongoose.connect(MONGO_URI(ENVIRONMENT))
         console.log("Connected to DB")
         localdb.update()
     }catch(err){
