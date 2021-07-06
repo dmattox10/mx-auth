@@ -16,7 +16,7 @@ const { APP_PORT } = require("./env")
 require('dotenv').config()
 
 // const passportConfig = require('./config/passport')
-const job = new CronJob('0 2 * * * *', () => {
+const job = new CronJob('0 0 2 * * *', () => {
   console.log('Running 2AM local db update.')
   console.time('localdb.update()')
   localdb.update()
@@ -29,10 +29,6 @@ connectDB()
 app.use(cors())
 app.use(helmet())
 app.use(morgan('dev'))
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-    extended: true
-  }))
 // app.use(session({ 
 //     resave: true,
 //     saveUninitialized: true,
