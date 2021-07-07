@@ -4,17 +4,22 @@ const Token = require('../models/token')
 const jwt = require('jsonwebtoken')
 const { SHARED_SECRET, REFRESH_SECRET } = require('../env')
 
+// TODO Add timestamp verification to prevent replay attacks.
 exports.register = async (req, res) => {
     try {
-        let user = await User.findOne({ username: req.body.username })
+        const { username, password, referrer, special } = req.body
+        const filter = { username: req.body.username }
+        const update = { username, password, $addToSet: { referrers: referrer } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
+        const options = { upsert: true }
+        let user = await User.findOne(filter)
         if (user) {
             return res.status(400).json({ error: 'User exists'})
         } else {
-            user = await new User(req.body).save()
+            user = await User.create(update, options)
             let accessToken = await user.createAccessToken()
             let refreshToken = await user.createRefreshToken()
 
-            return res.status(201).json({ accessToken, refreshToken })
+            return res.status(201).json({ accessToken, refreshToken, special })
         }
     } catch (error) {
         console.error(error)
