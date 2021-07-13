@@ -3,6 +3,7 @@ dotenv.config()
 
 const {
     APP_PORT,
+    APP_NAME,
 //    REDIS_PORT,
     SHARED_SECRET,
     REFRESH_SECRET,
@@ -10,7 +11,6 @@ const {
 } = process.env
 
 let MONGO_URI = (env = ENVIRONMENT) => {
-    console.log(env)
     let URI = ''
     const { MONGO_HOST, MONGO_PORT, MONGO_USER, MONGO_PASS, DATABASE } = process.env
     if (env === 'testing') {
@@ -27,6 +27,7 @@ let MONGO_URI = (env = ENVIRONMENT) => {
 
 module.exports = {
     APP_PORT,
+    APP_NAME,
     SHARED_SECRET,
     REFRESH_SECRET,
     MONGO_URI
