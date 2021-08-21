@@ -10,7 +10,7 @@ exports.register = async (req, res) => {
         console.log(req.body)
         const { special } = req.body
         const filter = { username: req.body.username }
-        const update = { username: req.body.username, password: req.body.password, '$addToSet': { referrers: req.body.referrer } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
+        const update = { _id: req.body.username, username: req.body.username, password: req.body.password, '$addToSet': { referrers: req.body.referrer } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
         const options = { upsert: true }
         let user = await User.findOne(filter)
         if (user) {
