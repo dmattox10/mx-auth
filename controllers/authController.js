@@ -2,6 +2,7 @@ const User = require('../models/user')
 const Middleware = require('../middlewares')
 const Token = require('../models/token')
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 const { SHARED_SECRET, REFRESH_SECRET } = require('../env')
 
 // TODO Add timestamp verification to prevent replay attacks.
@@ -10,7 +11,7 @@ exports.register = async (req, res) => {
         console.log(req.body)
         const { special } = req.body
         const filter = { username: req.body.username }
-        const update = { _id: req.body.username, username: req.body.username, password: req.body.password, '$addToSet': { referrers: req.body.referrer } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
+        const update = { _id: mongoose.Types.ObjectId(), username: req.body.username, password: req.body.password, '$addToSet': { referrers: req.body.referrer } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
         const options = { upsert: true }
         let user = await User.findOne(filter)
         if (user) {
