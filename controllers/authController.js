@@ -7,6 +7,8 @@ const { SHARED_SECRET, REFRESH_SECRET } = require('../env')
 // TODO Add timestamp verification to prevent replay attacks.
 exports.register = async (req, res) => {
     try {
+        console.log(req.body)
+        console.log(req.data)
         const { username, password, referrer, special } = req.body
         const filter = { username: username }
         const update = { username: username, password: password, $addToSet: { referrers: referrer } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
@@ -29,6 +31,8 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
+        console.log(req.body)
+        console.log(req.data)
         let user = await User.findOne({ username: req.body.username })
         if (!user) {
             res.status(404).json({ error: 'No user found!' })
