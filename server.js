@@ -4,8 +4,8 @@ const cors = require('cors')
 const helmet = require('helmet')
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
-const passport = require('passport')
-const flash = require('connect-flash')
+// const passport = require('passport')
+// const flash = require('connect-flash')
 // const session = require('express-session')
 const CronJob = require('cron').CronJob
 const localdb = require('./tools/localdb')
@@ -26,9 +26,13 @@ const job = new CronJob('0 0 2 * * *', () => {
 const app = express()
 connectDB()
 
+let jsonParser = bodyParser.json()
+let urlencodedParser = bodyParser.urlencoded({ extended: false })
+
 app.use(cors())
 app.use(helmet())
 app.use(morgan('dev'))
+app.use(jsonParser)
 // app.use(session({ 
 //     resave: true,
 //     saveUninitialized: true,
@@ -40,13 +44,13 @@ app.use(morgan('dev'))
 //     })
 
 // }))
-app.use(passport.initialize())
+// app.use(passport.initialize())
 
 // app.use(passport.session())
-app.use(flash())
+// app.use(flash())
 
 
-app.use('/v1/auth', authRouter)
+app.use('/v1/auth', urlencodedParser, authRouter)
 // app.use('/v1/user/dashboard', passportConfig.isAuthenticated, dashRouter)
 app.use('/stats', statsRouter)
 
