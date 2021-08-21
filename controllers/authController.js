@@ -16,10 +16,10 @@ exports.register = async (req, res) => {
         if (user) {
             return res.status(400).json({ error: 'User exists'})
         } else {
-            user = await User.create(update, options)
+            user = new User(update, options)
             let accessToken = await user.createAccessToken()
             let refreshToken = await user.createRefreshToken()
-
+            await user.save()
             return res.status(201).json({ accessToken, refreshToken, special })
         }
     } catch (error) {
