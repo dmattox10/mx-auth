@@ -8,8 +8,7 @@ const { SHARED_SECRET, REFRESH_SECRET } = require('../env')
 exports.register = async (req, res) => {
     try {
         console.log(req.body)
-        console.log(req.data)
-        const { username, password, referrer, special } = req.body.
+        const { special } = req.body
         const filter = { username: req.body.username }
         const update = { username: req.body.username, password: req.body.password, '$addToSet': { referrers: req.body.referrer } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
         const options = { upsert: true }
@@ -32,7 +31,6 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         console.log(req.body)
-        console.log(req.data)
         let user = await User.findOne({ username: req.body.username })
         if (!user) {
             res.status(404).json({ error: 'No user found!' })
