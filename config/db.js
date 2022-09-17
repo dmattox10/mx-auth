@@ -1,27 +1,22 @@
-const mongoose = require("mongoose")
-const low = require('lowdb')
-const FileSync = require('lowdb/adapters/FileSync')
-const adapter = new FileSync('db.json')
-const localdb = require('../tools/localdb')
-const { MONGO_URI } = require('../env')
+import { DB_HOST, DB_USER, DB_PASS, DB_NAME } from '../env'
+import knex from 'knex'
 
-const db = low(adapter)
-
-db.defaults({ service: {} }).write()
-
-const connectDB = () => {
-    connectWithRetry()
+const options = {
+    client: 'mysql2',
+    connection: {
+        host: DB_HOST,
+        user: DB_USER,
+        password: DB_PASS,
+        database: DB_NAME
+    }
 }
 
-const connectWithRetry = async () => {
-    return await mongoose.connect(MONGO_URI(), err => {
-        if (err) {
-            console.error('Failed to connect on startup = retrying in 1 second', err)
-            setTimeout(connectWithRetry, 1000)
-        }
-        console.log("Connected to DB")
-        localdb.update()
-    })
+let knex_conn
+
+async function connectDB(options=options) {
+    
+    knex_conn = knex(options);
+    return knex_conn;
 }
 
-module.exports = connectDB
+export default connectDB

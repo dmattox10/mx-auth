@@ -1,18 +1,17 @@
 const express = require("express")
-const connectDB = require("./config/db")
 const cors = require('cors')
 const helmet = require('helmet')
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
-// const passport = require('passport')
-// const flash = require('connect-flash')
-// const session = require('express-session')
+
 const CronJob = require('cron').CronJob
 const localdb = require('./tools/localdb')
 
+const connectDB = require("./config/db")
+
 const authRouter = require('./routes/authRouter')
 const statsRouter = require('./routes/statsRouter')
-const { APP_PORT } = require("./env")
+const { APP_PORT, APP_NAME } = require("./env")
 require('dotenv').config()
 
 // const passportConfig = require('./config/passport')
@@ -60,4 +59,4 @@ app.get('/', (req, res) => {
 
 job.start()
 const PORT = APP_PORT || 5050
-app.listen(PORT, () => console.log(`'Ello ${PORT}.`))
+app.listen(PORT, () => console.log(`'Ello ${APP_NAME}.`))
