@@ -1,4 +1,4 @@
-const express = require("express")
+const express = require('express')
 const cors = require('cors')
 const helmet = require('helmet')
 const morgan = require('morgan')
@@ -7,11 +7,11 @@ const bodyParser = require('body-parser')
 const CronJob = require('cron').CronJob
 const localdb = require('./tools/localdb')
 
-const connectDB = require("./config/db")
+const connectDB = require('./config/db')
 
 const authRouter = require('./routes/authRouter')
 const statsRouter = require('./routes/statsRouter')
-const { APP_PORT, APP_NAME } = require("./env")
+const { APP_PORT, APP_NAME } = require('./env')
 require('dotenv').config()
 
 // const passportConfig = require('./config/passport')
@@ -25,14 +25,14 @@ const job = new CronJob('0 0 2 * * *', () => {
 const app = express()
 connectDB()
 
-let jsonParser = bodyParser.json()
-let urlencodedParser = bodyParser.urlencoded({ extended: false })
+const jsonParser = bodyParser.json()
+const urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 app.use(cors())
 app.use(helmet())
 app.use(morgan('dev'))
 app.use(jsonParser)
-// app.use(session({ 
+// app.use(session({
 //     resave: true,
 //     saveUninitialized: true,
 //     secret: process.env.SECRET || 'ShhhSecret',
@@ -48,13 +48,12 @@ app.use(jsonParser)
 // app.use(passport.session())
 // app.use(flash())
 
-
 app.use('/v1/auth', urlencodedParser, authRouter)
 // app.use('/v1/user/dashboard', passportConfig.isAuthenticated, dashRouter)
 app.use('/stats', statsRouter)
 
 app.get('/', (req, res) => {
-    res.send('<h2>“The code is more what you’d call ‘guidelines’ than actual rules.” – Hector Barbossa</h2>')
+  res.send('<h2>“The code is more what you’d call ‘guidelines’ than actual rules.” – Hector Barbossa</h2>')
 })
 
 job.start()

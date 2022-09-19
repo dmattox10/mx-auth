@@ -3,7 +3,7 @@ const express = require('express')
 const Cors = require('cors')
 const ExpressBrute = require('express-brute')
 const authController = require('../controllers/authController')
-const authRouter = express.Router({ mergeParams: true }) 
+const authRouter = express.Router({ mergeParams: true })
 const store = new ExpressBrute.MemoryStore()
 const bruteforce = new ExpressBrute(store)
 
@@ -33,7 +33,7 @@ authRouter.delete('/logout', authController.logout)
 //                 status: 'done'
 //             })
 //         })
-  
+
 //     }
 //     else {
 //         return res.status(401).json(req) // Do I want 401's on all of these instead?
@@ -78,7 +78,7 @@ authRouter.delete('/logout', authController.logout)
 //         })
 //     }
 //     else {
-//         return res.status(500).json(req)   
+//         return res.status(500).json(req)
 //     }
 // })
 
