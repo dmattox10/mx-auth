@@ -1,5 +1,5 @@
-import { DB_HOST, DB_USER, DB_PASS, DB_NAME } from '../env'
-import knex from 'knex'
+const { DB_HOST, DB_USER, DB_PASS, DB_NAME } = require('../env')
+const knex = require('knex')
 
 const options = {
     client: 'mysql2',
@@ -14,9 +14,9 @@ const options = {
 let knex_conn
 
 async function connectDB(options=options) {
-    
+   
     knex_conn = knex(options);
     return knex_conn;
 }
 
-export default connectDB
+module.exports = connectDB

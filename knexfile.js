@@ -1,4 +1,4 @@
-import { DB_HOST, DB_USER, DB_PASS, DB_NAME } from './env.js'
+const { DB_HOST, DB_USER, DB_PASS, DB_NAME } = require('./env.js')
 
 const options = {
     client: 'mysql2',
@@ -7,31 +7,29 @@ const options = {
         user: DB_USER,
         password: DB_PASS,
         database: DB_NAME
-    }
+    },
+    migrations: {
+      tableName: 'knex_migrations'
+    },
 }
 
-export default {
+module.exports = {
 
   development: {
-    options
+    client: 'sqlite3',
+    connection: {
+      filename: path.join(__dirname, 'db.sqlite3')
+    },
+    migrations: {
+      tableName: 'knex_migrations'
+    },
+    useNullAsDefault: true
   },
 
 
-  // staging: {
-  //   client: 'postgresql',
-  //   connection: {
-  //     database: 'my_db',
-  //     user:     'username',
-  //     password: 'password'
-  //   },
-  //   pool: {
-  //     min: 2,
-  //     max: 10
-  //   },
-  //   migrations: {
-  //     tableName: 'knex_migrations'
-  //   }
-  // },
+  staging: {
+    options
+  },
 
 
 

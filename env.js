@@ -1,4 +1,4 @@
-import { config } from 'dotenv'
+const { config } = require('dotenv')
 config()
 
 const {
@@ -14,7 +14,7 @@ const {
     DB_NAME, 
 } = process.env
 
-export {
+module.exports = {
     APP_PORT,
     APP_NAME,
     SHARED_SECRET,
