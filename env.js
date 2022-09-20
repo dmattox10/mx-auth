@@ -1,5 +1,4 @@
-const { config } = require('dotenv')
-config()
+require('dotenv').config()
 
 const {
   APP_PORT,

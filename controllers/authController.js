@@ -1,83 +1,60 @@
-const User = require('../models/user')
-const Token = require('../models/token')
+const knex = require('knex')
 const jwt = require('jsonwebtoken')
-const mongoose = require('mongoose')
-const { SHARED_SECRET, REFRESH_SECRET } = require('../env')
 
-// TODO Add timestamp verification to prevent replay attacks.
-exports.register = async (req, res) => {
-  try {
-    console.log(req.body)
-    const { special } = req.body
-    const filter = { username: req.body.username }
-    const update = { _id: mongoose.Types.ObjectId(), username: req.body.username, password: req.body.password, $addToSet: { referrers: req.body.referrer } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
-    const options = { upsert: true }
-    let user = await User.findOne(filter)
-    if (user) {
-      return res.status(400).json({ error: 'User exists' })
-    } else {
-      user = new User(update, options)
-      const accessToken = await user.createAccessToken()
-      const refreshToken = await user.createRefreshToken()
-      await user.save()
-      return res.status(201).json({ accessToken, refreshToken, special })
-    }
-  } catch (error) {
-    console.error(error)
-    return res.status(500).json({ error: 'Internal Server Error!' })
-  }
-}
+const { REFRESH_SECRET, SHARED_SECRET } = require('../env')
+exports.refresh = async (req, res) => {
+  const { refreshToken } = req.headers
 
-exports.login = async (req, res) => {
   try {
-    console.log(req.body)
-    const user = await User.findOne({ username: req.body.username })
-    if (!user) {
-      res.status(404).json({ error: 'No user found!' })
-    } else {
-      const valid = user.validPassword(req.body.password)
-      if (valid) {
-        const accessToken = await user.createAccessToken()
-        const refreshToken = await user.createRefreshToken()
-        return res.status(200).json({ accessToken, refreshToken })
-      } else {
-        return res.status(401).json({ error: 'Invalid Password!' })
-      }
-    }
-  } catch (error) {
-    console.error(error)
-    return res.status(500).json({ error: 'Internal Server Error!' })
-  }
-}
+    const { id } = jwt.verify(
+      refreshToken,
+      `${REFRESH_SECRET}`
+    )
 
-exports.generateRefreshToken = async (req, res) => {
-  try {
-    const { refreshToken } = req.body
-    if (!refreshToken) {
-      return res.status(403).json({ error: 'Access denied, missing token' })
-    } else {
-      const tokenDoc = await Token.findOne({ token: refreshToken })
-      if (!tokenDoc) {
-        return res.status(401).json({ error: 'Token Expired!' })
-      } else {
-        const payload = jwt.verify(tokenDoc.token, REFRESH_SECRET)
-        const accessToken = jwt.sign({ user: payload }, SHARED_SECRET, { expiresIn: '10m' })
-        return res.status(200).json({ accessToken })
-      }
+    const [user] = await knex
+      .table('tokens')
+      .where('userId', id)
+      .limit(1)
+
+    if (user.activeToken === refreshToken) {
+      const accessToken = jwt.sign(
+        {
+          id: user.userId,
+          role: 'user'
+        },
+        `${SHARED_SECRET}`
+      )
+
+      return res.status(200).json({ accessToken })
     }
-  } catch (error) {
-    console.error(error)
-    return res.status(500).json({ error: 'Internal Server Error!' })
+
+    return res.status(400).json({ err: 'Token expired' })
+  } catch (err) {
+    const error = new Error(err)
+
+    return res.status(500).json({ err: error.message })
   }
 }
 
 exports.logout = async (req, res) => {
+  const { accessToken } = req.headers
   try {
-    const { refreshToken } = req.body
-    await Token.findOneAndDelete({ token: refreshToken })
-    return res.status(200).json({ success: 'User Logged Out.' })
-  } catch (error) {
-    console.error(error)
-    return res.status(500).json({ error: 'Internal Server Error!' })
+    const { id } = jwt.verify(
+      accessToken,
+      `${SHARED_SECRET}`
+    )
+    if (id) {
+      await knex
+        .table('tokens')
+        .where('userId', id)
+        .limit(1)
+        .delete()
+      return res.status(204)
+    }
+    return res.status(404).json({ err: 'matching user with active session does not exist!' })
+  } catch (err) {
+    const error = new Error(err)
+
+    return res.status(500).json({ err: error.message })
   }
 }

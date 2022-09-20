@@ -1,11 +1,11 @@
 export const up = function (knex, Promise) {
-  return knex.schema.createTable('users', function (table) {
-    table.increments()
-    table.string('username').notNullable()
-    table.string('password').notNullable()
-    table.string('app_name').notNullable()
-    table.timestamp('created_at').defaultTo(knex.fn.now())
-    table.timestamp('updated_at').defaultTo(knex.fn.now())
+  return knex.schema.createTable('users', table => {
+    table.increments('id').primary().notNullable()
+    table.string('username').unique().notNullable()
+    table.string('salt').notNullable()
+    table.string('hash').notNullable()
+
+    table.timestamps(true, true)
   })
 }
 
