@@ -1,4 +1,4 @@
-import { ENVIRONMENT } from '../env'
+const { ENVIRONMENT } = require('../env')
 
 const environment = ENVIRONMENT || 'development'
 const config = require('./knexfile.js')[environment]

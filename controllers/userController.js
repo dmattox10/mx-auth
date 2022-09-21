@@ -1,4 +1,4 @@
-const knex = require('knex')
+const knex = require('../knex/knex')
 
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
