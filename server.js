@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 // const CronJob = require('cron').CronJob
 
 const authRouter = require('./routes/authRouter')
-const { APP_PORT, APP_NAME } = require('./env')
+const { APP_PORT, APP_NAME, WHITELIST_URLS } = require('./env')
 require('dotenv').config()
 
 // const job = new CronJob('0 0 2 * * *', () => {
@@ -22,7 +22,9 @@ const app = express()
 const jsonParser = bodyParser.json()
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 
-app.use(cors())
+app.use(cors({
+  origin: WHITELIST_URLS
+}))
 app.use(helmet())
 app.use(morgan('dev'))
 app.use(jsonParser)

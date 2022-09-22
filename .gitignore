@@ -105,3 +105,6 @@ dist
 
 # lowdb
 db.json
+
+# sqlite
+*.sqlite3

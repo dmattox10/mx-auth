@@ -1,29 +1,25 @@
-const knex = require('../knex/knex')
-
 const jwt = require('jsonwebtoken')
-const crypto = require('crypto')
+const cuid = require('cuid')
 
+const knex = require('../knex/knex')
 const { REFRESH_SECRET, SHARED_SECRET } = require('../env')
 
 exports.register = async (req, res) => {
-  const { username, password } = req.body
-
-  if (!username || !password) {
+  const { email, hashedPassword, portal } = req.body
+  if (!email || !hashedPassword || !portal) {
     return res.status(400).json({ err: 'All fields required.' })
   }
 
   try {
-    const salt = crypto.randomBytes(16).toString('hex')
-    const hash = crypto
-      .pbkdf2Sync(password, salt, 1000, 64, 'sha512')
-      .toString('hex')
-
+    const userCuid = cuid()
+    let portals = [].push(portal)
     const [user] = await knex
       .table('users')
       .insert({
-        hash,
-        salt,
-        username
+        hashedPassword,
+        portals,
+        email,
+        userCuid
       })
       .returning('*')
 
@@ -36,22 +32,30 @@ exports.register = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
-  const { username, password } = req.body
+  const { email, hashedPassword, portal } = req.body
 
-  if (!username || !password) {
+  if (!email || !hashedPassword) {
     return res.status(400).json({ err: 'All fields required.' })
   }
 
   try {
     const [user] = await knex
       .table('users')
-      .where('username', username)
+      .where('email', email)
 
-    const hash = crypto
-      .pbkdf2Sync(password, user.salt, 1000, 64, 'sha512')
-      .toString('hex')
-
-    if (hash === user.hash) {
+    if (hashedPassword === user.hashedPassword) {
+      // safe place to edit the unning list of which of the services auth is mx-auth is used for that this user uses
+      if (!user.portals.includes(portal)) {
+        let portalsCopy = user.portals
+        portalsCopy.push(portal)
+        const changes = {
+          portals: portalsCopy
+        }
+        const editedUser = await knex
+          .table('users')
+          .where('email', email)
+          .update(changes)
+      }
       const accessToken = jwt.sign(
         {
           id: user.id,
