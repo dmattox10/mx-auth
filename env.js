@@ -1,16 +1,18 @@
 require('dotenv').config()
 
 const {
-  APP_PORT,
   APP_NAME,
-  //    REDIS_PORT,
-  SHARED_SECRET,
-  REFRESH_SECRET,
-  ENVIRONMENT,
+  APP_PORT,
   DB_HOST,
   DB_USER,
   DB_PASS,
-  DB_NAME
+  DB_NAME,
+  EMAIL_HOST,
+  EMAIL_USER,
+  EMAIL_PASS,
+  ENVIRONMENT,
+  REFRESH_SECRET,
+  SHARED_SECRET,
 } = process.env
 
 module.exports = {
@@ -20,7 +22,10 @@ module.exports = {
   DB_USER,
   DB_PASS,
   DB_NAME,
+  EMAIL_HOST,
+  EMAIL_USER,
+  EMAIL_PASS,
   ENVIRONMENT,
   REFRESH_SECRET,
-  SHARED_SECRET
+  SHARED_SECRET,
 }

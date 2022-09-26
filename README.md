@@ -20,10 +20,11 @@ __Tech__
 
 __What I Learned__
 
-- JWT Token flow with refresh tokens used to get new auth tokens instead of signing out
-- Client side password salting and hashing, I insist! User passwords never leave the device.
-- CORS Whitelisting
-- Using the shared secret to auth separate apps in the style of vis-a-vis microservices, while being able to quickly revoke the secret and all tokens by changing it in the event of some kind of breach
+- Passwordless Auth!
+- JWT Token flow with refresh tokens used to get new auth tokens instead of signing out, while allowing the JWT tokens to still have reasonably short lives themselves.
+- Client-side password salting and hashing, I insist! User passwords never leave the device. If they forget they can reset by email, and the personal salt makes the hashed passwords unable to ever compromise one-another.
+- CORS Whitelisting!
+- Using the shared secret to auth separate apps vis-a-vis microservices, while being able to quickly revoke the secret and all tokens by changing it in the event of some kind of breach
 
 ## Getting Started
 
@@ -31,8 +32,12 @@ Env settings affect database selection. development uses SQLite, as written stag
 
 __Sample server/.env file__
 ```
-APP_PORT = 5000
-APP_NAME = mx-auth
+APP_NAME=mx-auth
+APP_PORT=5000
+DOMAIN=yourdomain.com
+EMAIL_HOST=gmail.com
+EMAIL_USER=you
+EMAIL_PASS=yourGoogleAppPassword
 ENVIRONMENT = development
 SHARED_SECRET = shhhh
 REFRESH_SECRET = sofreshhhh
@@ -74,7 +79,7 @@ __POST /v1/auth/register__
 This route expects:
  - email: The registering user's email address.
  - hashedPassword: The registering user's already salted + hashed password
- - portal: The string APP_NAME used in my projects, in this case which project is using mx-auth to register the user.
+ - portal: The environment string APP_NAME used in my projects, in this case which project is using mx-auth to register the user.
 
 This route returns:
  - the user created in the system.
@@ -82,11 +87,18 @@ This route returns:
 __POST /v1/auth/login__
 This route expects:
  - email
- - HashedPassword
+ - hashedPassword
 
 This route returns:
  - an accessToken
  - a refreshToken
+
+__POST /v1/auth/magic__
+This route expects:
+ - email
+ - portal
+
+This route returns status 200 and an email containing a magic link is sent. Following the link initiates new auth flow in the originating app using the magic token to get new refresh and access tokens (this is built into the client code of the front-ends that use mx-auth)
 
 __GET /v1/auth/refresh__
 This route expects:
@@ -100,6 +112,6 @@ This route expects:
  - accessToken: a valid accessToken in the header.
 
 This route returns:
- - http status code 204 in the case the token exists, and was deleted.
+ - http status code 204.
 
 This one removes the users current token from the system, disabling their access from all devices, to all services.

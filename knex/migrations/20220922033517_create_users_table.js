@@ -3,7 +3,7 @@ exports.up = function (knex, Promise) {
       table.increments('id').primary().notNullable()
       table.string('userCuid').unique().notNullable()
       table.string('email').unique().notNullable()
-      table.string('passwordHashed').notNullable()
+      table.string('hashedPassword').notNullable()
       table.specificType('portals', 'text ARRAY')
       table.timestamps(true, true)
     })

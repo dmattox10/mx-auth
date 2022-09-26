@@ -6,13 +6,15 @@ const { REFRESH_SECRET, SHARED_SECRET } = require('../env')
 
 exports.register = async (req, res) => {
   const { email, hashedPassword, portal } = req.body
+  console.log(portal)
   if (!email || !hashedPassword || !portal) {
     return res.status(400).json({ err: 'All fields required.' })
   }
 
   try {
     const userCuid = cuid()
-    let portals = [].push(portal)
+    let portals = []
+    portals.push(portal)
     const [user] = await knex
       .table('users')
       .insert({
@@ -32,7 +34,7 @@ exports.register = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
-  const { email, hashedPassword, portal } = req.body
+  const { email, hashedPassword, portal, userCuid } = req.body
 
   if (!email || !hashedPassword) {
     return res.status(400).json({ err: 'All fields required.' })
@@ -46,7 +48,7 @@ exports.login = async (req, res) => {
     if (hashedPassword === user.hashedPassword) {
       // safe place to edit the unning list of which of the services auth is mx-auth is used for that this user uses
       if (!user.portals.includes(portal)) {
-        let portalsCopy = user.portals
+        let portalsCopy = [...user.portals]
         portalsCopy.push(portal)
         const changes = {
           portals: portalsCopy
@@ -80,12 +82,15 @@ exports.login = async (req, res) => {
       if (actToken) {
         await knex
           .table('tokens')
-          .update({ activeToken: refreshToken })
+          .update({ 
+            activeToken: refreshToken,
+            userCuid: userCuid })
           .where('userId', user.id)
       } else {
         await knex.table('tokens').insert({
           userId: user.id,
-          activeToken: refreshToken
+          activeToken: refreshToken,
+          userCuid: userCuid
         })
       }
 

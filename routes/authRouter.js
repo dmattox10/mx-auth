@@ -12,8 +12,10 @@ authRouter.get('/refresh', Cors(), bruteforce.prevent, authController.refresh)
 
 authRouter.delete('/logout', Cors(), bruteforce.prevent, authController.logout)
 
-authRouter.post('/register', Cors(), bruteforce.prevent, userController.register)
+authRouter.post('/register', Cors(), bruteforce.prevent, authController.register)
 
-authRouter.post('/login', Cors(), bruteforce.prevent, userController.login)
+authRouter.post('/login', Cors(), bruteforce.prevent, authController.login)
+
+authRouter.post('/magic', Cors(), bruteforce.prevent, authController.magic)
 
 module.exports = authRouter

@@ -107,4 +107,4 @@ dist
 db.json
 
 # sqlite
-*.sqlite3
+db.sqlite3
