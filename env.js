@@ -2,9 +2,10 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const {
+    API_KEY,
     APP_PORT,
     APP_NAME,
-//    REDIS_PORT,
+    SEND_DOMAIN,
     SHARED_SECRET,
     REFRESH_SECRET,
     ENVIRONMENT
@@ -26,8 +27,10 @@ let MONGO_URI = (env = ENVIRONMENT) => {
 
 
 module.exports = {
+    API_KEY,
     APP_PORT,
     APP_NAME,
+    SEND_DOMAIN,
     SHARED_SECRET,
     REFRESH_SECRET,
     MONGO_URI
