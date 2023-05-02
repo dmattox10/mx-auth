@@ -1,0 +1,17 @@
+services:
+  mx-auth:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: mx-auth
+    container_name: mx-auth
+    hostname: mx-auth
+    command: /usr/src/app/node_modules/.bin/node server.js
+    volumes:
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - PORT=4044
+    ports:
+      - "4044:4044"
+    env_file: ./.env

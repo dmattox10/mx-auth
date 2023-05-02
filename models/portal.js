@@ -5,7 +5,7 @@ mongoose.set('useFindAndModify', false)
 const portalSchema = mongoose.Schema({
 
     name: String,
-    users: Number,
+    users: Array,
 
 })
 

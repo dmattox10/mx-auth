@@ -11,6 +11,7 @@ const CronJob = require('cron').CronJob
 const localdb = require('./tools/localdb')
 
 const authRouter = require('./routes/authRouter')
+const profileRouter = require('./routes/profileRouter')
 const statsRouter = require('./routes/statsRouter')
 const { APP_PORT } = require("./env")
 require('dotenv').config()
@@ -51,8 +52,9 @@ app.use(jsonParser)
 
 
 app.use('/v1/auth', urlencodedParser, authRouter)
+app.user('/v1/users', urlencodedParser, profileRouter)
 // app.use('/v1/user/dashboard', passportConfig.isAuthenticated, dashRouter)
-app.use('/stats', statsRouter)
+// app.use('/stats', statsRouter)
 
 app.get('/', (req, res) => {
     res.send('<h2>“The code is more what you’d call ‘guidelines’ than actual rules.” – Hector Barbossa</h2>')

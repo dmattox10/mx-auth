@@ -2,7 +2,7 @@ const User = require('../models/user')
 const Token = require('../models/token')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
-import { MailerSend, EmailParams, Sender, Recipient } from "mailersend"
+const { MailerSend, EmailParams, Sender, Recipient } = require("mailersend")
 const { API_KEY, SEND_DOMAIN, SHARED_SECRET, REFRESH_SECRET } = require('../env')
 
 // TODO Add timestamp verification to prevent replay attacks.
@@ -20,6 +20,8 @@ exports.register = async (req, res) => {
             let accessToken = await user.createAccessToken()
             let refreshToken = await user.createRefreshToken()
             await user.save()
+            const portalFilter = { name: portal }
+            const portalUpdate = { '$addToSet': { users: user._id }}
             return res.status(201).json({ accessToken, refreshToken, special })
         }
     } catch (error) {
@@ -86,7 +88,7 @@ exports.magic = async (req, res) => {
   try {
     let user = await User.findOne({ email: email })
     if (!user) {
-        res.status(404).json({ error: 'No user found!' })
+        res.status(404).json({ error: 'No user found!' }) // Tell the front end to lie
     } else {
       let accessToken = await user.createAccessToken(300)
       
