@@ -52,7 +52,7 @@ app.use(jsonParser)
 
 
 app.use('/v1/auth', urlencodedParser, authRouter)
-app.user('/v1/users', urlencodedParser, profileRouter)
+app.use('/v1/users', urlencodedParser, profileRouter)
 // app.use('/v1/user/dashboard', passportConfig.isAuthenticated, dashRouter)
 // app.use('/stats', statsRouter)
 
