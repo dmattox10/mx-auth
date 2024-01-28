@@ -7,7 +7,7 @@ const portalSchema = mongoose.Schema({
     name: String,
     users: Array,
 
-})
+})  
 
 portalSchema.plugin(findOrCreate)
 

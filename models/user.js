@@ -3,6 +3,9 @@ const Token = require('./token')
 const jwt = require('jsonwebtoken')
 const findOrCreate = require('mongoose-findorcreate')
 const { SHARED_SECRET, REFRESH_SECRET } = require('../env')
+const hashwasm = require('hash-wasm')
+let salt = new Uint8Array(16)
+globalThis.crypto.getRandomValues(salt)   
 
 // define the schema for our user model
 // TODO Add objects for other social signins
@@ -12,14 +15,34 @@ const userSchema = new mongoose.Schema({
     firstName: {type: String, required: true },
     lastName: {type: String, required: true },
     password: { type: String, required: true },
-    portals        : Array,
-    role             : String
+    referrers: { type : Array, required: false }
 
 })
 
 // generating a hash
 
 userSchema.plugin(findOrCreate)
+
+
+
+// userSchema.pre('save', async function(next) {
+    
+//     next();
+  
+//   })
+
+  userSchema.pre('save', async function(next) { 
+    const hashedPassword = await hashwasm.argon2i({password: user.password,
+        salt, // salt is a buffer containing random bytes
+    parallelism: 1,
+    iterations: 256,
+    memorySize: 512, // use 512KB memory
+    hashLength: 32, // output size = 32 bytes
+    outputType: 'encoded'})
+    this.password = hashedPassword
+    console.log(this)
+    next()
+    })
 
 userSchema.methods = {
     createAccessToken: async function (time) {
@@ -29,7 +52,7 @@ userSchema.methods = {
                 { user: { _id, email } },
                 SHARED_SECRET,
                 {
-                expiresIn: time || "10m",
+                expiresIn: "10m",
                 }
             )
             return accessToken
@@ -45,7 +68,7 @@ userSchema.methods = {
                 { user: { _id, email } },
                 REFRESH_SECRET,
                 {
-                    expiresIn: time || "30d",
+                    expiresIn: "30d",
                 }
             )
             await new Token({ token: refreshToken }).save()
@@ -55,6 +78,29 @@ userSchema.methods = {
             return
         }
     },
+    hashPassword: async function(password) {
+        let hash
+        try {
+      
+            hash = await hashwasm.argon2i({password: password,
+                parallelism: 1,
+                iterations: 256,
+                memorySize: 512, // use 512KB memory
+                hashLength: 32, // output size = 32 bytes
+                outputType: 'encoded'})
+      
+        } catch(err){
+      
+          // error handling here
+          console.log(err)
+      
+        }
+        return hash;
+      },
+    validPassword: async function (formPassword) {
+        const isValid = await hashwasm.argon2Verify({password: formPassword,  hash: this.password})
+        return isValid
+    }
 }
-
-module.exports = mongoose.model('User', userSchema)
+const User = mongoose.model('Users', userSchema)
+module.exports = User

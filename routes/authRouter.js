@@ -7,15 +7,15 @@ const authRouter = express.Router({ mergeParams: true })
 const store = new ExpressBrute.MemoryStore()
 const bruteforce = new ExpressBrute(store)
 
-authRouter.post('/register', Cors(), bruteforce.prevent, authController.register)
+authRouter.post('/register', Cors(), authController.register)
 
-authRouter.post('/login', Cors(), bruteforce.prevent, authController.login)
+authRouter.post('/login', Cors(), authController.login)
 
-authRouter.post('/refresh', Cors(), bruteforce.prevent, authController.generateRefreshToken)
+authRouter.post('/refresh', Cors(), authController.generateRefreshToken)
 
 authRouter.delete('/logout', authController.logout)
 
-// authRouter.post('/app/referrer', Cors(), bruteforce.prevent, Middleware.checkAuth, async (req, res) => {
+// authRouter.post('/app/referrer', Cors(), Middleware.checkAuth, async (req, res) => {
 //     const referrer = req.body.referrer
 //     // TODO JWT Check here!
 //     if (req.user) {
@@ -40,9 +40,9 @@ authRouter.delete('/logout', authController.logout)
 //     }
 // })
 
-// authRouter.get('/facebook', Cors(), bruteforce.prevent, passport.authenticate('facebook'))
+// authRouter.get('/facebook', Cors(), passport.authenticate('facebook'))
 
-// authRouter.get('/facebook/callback', Cors(), bruteforce.prevent, passport.authenticate('facebook'), (req, res) => {
+// authRouter.get('/facebook/callback', Cors(), passport.authenticate('facebook'), (req, res) => {
 //     if (req.user) {
 //         const token = sign(user)
 //         return res.status(200).json({
@@ -54,9 +54,9 @@ authRouter.delete('/logout', authController.logout)
 //     }
 // })
 
-// authRouter.get('/github', Cors(), bruteforce.prevent, passport.authenticate('github'))
+// authRouter.get('/github', Cors(), passport.authenticate('github'))
 
-// authRouter.get('/github/callback', Cors(), bruteforce.prevent, passport.authenticate('github'), (req, res) => {
+// authRouter.get('/github/callback', Cors(), passport.authenticate('github'), (req, res) => {
 //     if (req.user) {
 //         const token = sign(user)
 //         return res.status(200).json({
@@ -68,9 +68,9 @@ authRouter.delete('/logout', authController.logout)
 //     }
 // })
 
-// authRouter.get('/google', Cors(), bruteforce.prevent, passport.authenticate('google'))
+// authRouter.get('/google', Cors(), passport.authenticate('google'))
 
-// authRouter.get('/google/callback', Cors(), bruteforce.prevent, passport.authenticate('google'), (req, res) => {
+// authRouter.get('/google/callback', Cors(), passport.authenticate('google'), (req, res) => {
 //     if (req.user) {
 //         const token = sign(user)
 //         return res.status(200).json({
@@ -82,9 +82,9 @@ authRouter.delete('/logout', authController.logout)
 //     }
 // })
 
-// authRouter.get('/twitter', Cors(), bruteforce.prevent, passport.authenticate('twitter'))
+// authRouter.get('/twitter', Cors(), passport.authenticate('twitter'))
 
-// authRouter.get('/twitter/callback', Cors(), bruteforce.prevent, passport.authenticate('twitter'), (req, res) => {
+// authRouter.get('/twitter/callback', Cors(), passport.authenticate('twitter'), (req, res) => {
 //     if (req.user) {
 //         const token = sign(user)
 //         return res.status(200).json({

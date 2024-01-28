@@ -4,25 +4,40 @@ const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const { MailerSend, EmailParams, Sender, Recipient } = require("mailersend")
 const { API_KEY, SEND_DOMAIN, SHARED_SECRET, REFRESH_SECRET } = require('../env')
+// const Portal = require('../models/portal')
 
 // TODO Add timestamp verification to prevent replay attacks.
 exports.register = async (req, res) => {
     try {
-        const { portal, email, password } = req.body
-        const filter = { email: email }
-        const update = { _id: mongoose.Types.ObjectId(), email: email, password: password, '$addToSet': { referrers: portal } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
-        const options = { upsert: true }
+        const { appName, email, password, firstName, lastName } = req.body
+        const filter = { email }
+        const update = { _id: mongoose.Types.ObjectId(), email, password, firstName, lastName, '$addToSet': { referrers: appName } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
+        // const options = { upsert: true }
         let user = await User.findOne(filter)
         if (user) {
             return res.status(400).json({ error: 'User exists'})
         } else {
-            user = new User(update, options)
+            user = new User(update/*, options*/)
             let accessToken = await user.createAccessToken()
             let refreshToken = await user.createRefreshToken()
-            await user.save()
-            const portalFilter = { name: portal }
-            const portalUpdate = { '$addToSet': { users: user._id }}
-            return res.status(201).json({ accessToken, refreshToken, special })
+            user.save()
+            // let hashedPassword = await user.hashPassword(password)
+            // update.password = hashedPassword
+            // const secureUser = await User.findOne(filter, update)
+            // const portalFilter = { name: appName }
+            // const portalUpdate = { name: appName, '$addToSet': { users: mongoose.Types.ObjectId( user._id ) } }
+            // let portal = await Portal.findOne(portalFilter)
+            // let portal = portal.findOne({name: appName})
+            // if (portal) {
+            //     Portal.findOneAndUpdate(portalUpdate)
+            // }
+            // else {
+            //     portal = new Portal(portalUpdate)
+            // }
+            // console.log(secureUser)
+            // portal = new portal(portalUpdate, )
+            // console.log(portal)
+            return res.status(201).json({ accessToken, refreshToken })
         }
     } catch (error) {
         console.error(error)
@@ -36,11 +51,12 @@ exports.login = async (req, res) => {
         if (!user) {
             res.status(404).json({ error: 'No user found!' })
         } else {
-            let valid = user.validPassword(password)
+            let valid = validPassword(password)
+            console.log(valid)
             if (valid) {
                 let accessToken = await user.createAccessToken()
                 let refreshToken = await user.createRefreshToken()
-                return res.status(200).json({ accessToken, refreshToken })
+                return res.status(200).json({ accessToken, refreshToken, user })
             } else {
                 return res.status(401).json({ error: 'Invalid Password!'})
             }
@@ -100,7 +116,7 @@ exports.magic = async (req, res) => {
     const sentFrom = new Sender(`no-reply@${SEND_DOMAIN}`, "no-reply");
 
     const recipients = [
-      new Recipient(email, `${user.firstName} ${user.lastname}`)
+      new Recipient(email, `${user.firstName}`)
     ];
 
     const emailParams = new EmailParams()
