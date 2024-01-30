@@ -32,15 +32,14 @@ userSchema.plugin(findOrCreate)
 //   })
 
   userSchema.pre('save', async function(next) { 
-    const hashedPassword = await hashwasm.argon2i({password: user.password,
-        salt, // salt is a buffer containing random bytes
+    const hashedPassword = await hashwasm.argon2i({password: this.password,
+    salt, // salt is a buffer containing random bytes
     parallelism: 1,
     iterations: 256,
     memorySize: 512, // use 512KB memory
     hashLength: 32, // output size = 32 bytes
     outputType: 'encoded'})
     this.password = hashedPassword
-    console.log(this)
     next()
     })
 
