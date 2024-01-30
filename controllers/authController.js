@@ -21,22 +21,17 @@ exports.register = async (req, res) => {
             let accessToken = await user.createAccessToken()
             let refreshToken = await user.createRefreshToken()
             user.save()
-            // let hashedPassword = await user.hashPassword(password)
-            // update.password = hashedPassword
-            // const secureUser = await User.findOne(filter, update)
-            // const portalFilter = { name: appName }
-            // const portalUpdate = { name: appName, '$addToSet': { users: mongoose.Types.ObjectId( user._id ) } }
-            // let portal = await Portal.findOne(portalFilter)
+            const portalFilter = { name: appName }
+            const portalUpdate = { name: appName, '$addToSet': { users: mongoose.Types.ObjectId( user._id ) } }
+            let portal = await Portal.findOne(portalFilter)
             // let portal = portal.findOne({name: appName})
-            // if (portal) {
-            //     Portal.findOneAndUpdate(portalUpdate)
-            // }
-            // else {
-            //     portal = new Portal(portalUpdate)
-            // }
-            // console.log(secureUser)
-            // portal = new portal(portalUpdate, )
-            // console.log(portal)
+            if (portal) {
+                Portal.findOneAndUpdate(portalUpdate)
+            }
+            else {
+                portal = new Portal(portalUpdate)
+                portal.save()
+            }
             return res.status(201).json({ accessToken, refreshToken })
         }
     } catch (error) {
@@ -128,7 +123,7 @@ exports.magic = async (req, res) => {
       .setText(`https://${portal}.${SEND_DOMAIN}.com/magic?token=${accessToken}`);
 
     await mailerSend.email.send(emailParams);
-          return res.status(200).send()
+          return res.status(200).json({ })
         }
     } catch (error) {
         console.error(error)

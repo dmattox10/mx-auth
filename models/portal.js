@@ -4,8 +4,13 @@ mongoose.set('useFindAndModify', false)
 
 const portalSchema = mongoose.Schema({
 
-    name: String,
-    users: Array,
+    name: {
+        type: String,
+        required: true
+    },
+    users: {
+        type: [mongoose.Types.ObjectId]
+    }
 
 })  
 

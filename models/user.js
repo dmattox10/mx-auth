@@ -8,14 +8,13 @@ let salt = new Uint8Array(16)
 globalThis.crypto.getRandomValues(salt)   
 
 // define the schema for our user model
-// TODO Add objects for other social signins
 const userSchema = new mongoose.Schema({
 
     email: { type: String, required: true, unique: true },
     firstName: {type: String, required: true },
     lastName: {type: String, required: true },
     password: { type: String, required: true },
-    referrers: { type : Array, required: false }
+    referrers: { type : [mongoose.Types.ObjectId], required: false }
 
 })
 
