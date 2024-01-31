@@ -17,7 +17,7 @@ exports.register = async (req, res) => {
         if (user) {
             return res.status(400).json({ error: 'User exists'})
         } else {
-            user = new User(update/*, options*/)
+            user = await new User(update/*, options*/)
             let accessToken = await user.createAccessToken()
             let refreshToken = await user.createRefreshToken()
             user.save()
@@ -32,7 +32,7 @@ exports.register = async (req, res) => {
                 portal = new Portal(portalUpdate)
                 portal.save()
             }
-            return res.status(201).json({ accessToken, refreshToken })
+            return res.status(201).json({ accessToken, refreshToken, user })
         }
     } catch (error) {
         console.error(error)
