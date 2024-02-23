@@ -1,5 +1,6 @@
 const User = require('../models/user')
 const Token = require('../models/token')
+const Portal = require('../models/portal')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const { MailerSend, EmailParams, Sender, Recipient } = require("mailersend")
@@ -11,51 +12,84 @@ exports.register = async (req, res) => {
     try {
         const { appName, email, password, firstName, lastName } = req.body
         const filter = { email }
-        const update = { _id: mongoose.Types.ObjectId(), email, password, firstName, lastName, '$addToSet': { referrers: appName } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
+        const update = { _id: mongoose.Types.ObjectId(), email, password, firstName, lastName, $addToSet: { referrers: appName } } // MAY NEED TO PUT QUOTES AROUND ADDTOSET
         // const options = { upsert: true }
-        let user = await User.findOne(filter)
-        if (user) {
-            return res.status(400).json({ error: 'User exists'})
-        } else {
-            user = await new User(update/*, options*/)
-            let accessToken = await user.createAccessToken()
-            let refreshToken = await user.createRefreshToken()
-            user.save()
-            const portalFilter = { name: appName }
-            const portalUpdate = { name: appName, '$addToSet': { users: mongoose.Types.ObjectId( user._id ) } }
-            let portal = await Portal.findOne(portalFilter)
-            // let portal = portal.findOne({name: appName})
-            if (portal) {
-                Portal.findOneAndUpdate(portalUpdate)
+        User.findOne(filter).then(user => {
+            if (!user) {
+                new User(update/*, options*/).then(user => {
+                    getTokens(user).then(tokens => {
+                        user.Authorization = tokens.Authorization
+                        user.refreshtoken = tokens.refreshtoken
+                        user.save().then(newUser=> {
+                            const portalFilter = { name: appName }
+                            const portalUpdate = { name: appName, $addToSet: { users: mongoose.Types.ObjectId(user._id) } }
+                            Portal.findOne(portalFilter).then(portal => {
+                                if (!portal) {
+                                    portal = new Portal(portalUpdate)
+                                    portal.save()
+                                }
+                                Portal.findOneAndUpdate(portalUpdate)
+                                return res
+                                    .status(201)
+                                    .header('refreshtoken', tokens.refreshtoken)
+                                    .header('Authorization', tokens.Authorization)
+                                    .json({ user })
+                            })
+                        })
+                    }) 
+                })
+                // return res.status(201).json({ Authorization, refreshtoken, user })
+            } else { // catchall?
+                return res.status(400).json({ error: 'User exists' })
             }
-            else {
-                portal = new Portal(portalUpdate)
-                portal.save()
-            }
-            return res.status(201).json({ accessToken, refreshToken, user })
-        }
+        })
     } catch (error) {
         console.error(error)
-        return res.status(500).json({ error: 'Internal Server Error!'})
+        return res.status(500).json({ error: 'Internal Server Error!' })
     }
 }
 
-exports.login = async (req, res) => {
-    try {
-        let user = await User.findOne({ email: email })
-        if (!user) {
-            res.status(404).json({ error: 'No user found!' })
-        } else {
-            let valid = validPassword(password)
-            console.log(valid)
-            if (valid) {
-                let accessToken = await user.createAccessToken()
-                let refreshToken = await user.createRefreshToken()
-                return res.status(200).json({ accessToken, refreshToken, user })
-            } else {
-                return res.status(401).json({ error: 'Invalid Password!'})
-            }
+async function getTokens(user) {
+    let tokens = {}
+    return new Promise((resolve, reject) => {
+        try {
+            user.createAuthorization().then(Authorization => {
+                tokens.Authorization = Authorization
+                user.createRefreshToken().then(refreshtoken => {
+                    tokens.refreshtoken = refreshtoken
+                    resolve(tokens)
+                })
+            })
+        } catch (err) {
+            console.log('bad juju: ', err)
+            reject(err)
         }
+    })
+}
+
+exports.login = async (req, res) => {
+    const { email, password } = req.body
+    console.log(email, password)
+    try {
+        User.findOne({ email: email }).then(user => {
+            if (!user) {
+                res.status(404).json({ error: 'No user found!' })
+            }
+            user.validPassword(password).then(valid => {
+                if (!valid) {
+                    return res.status(401).json({ error: 'Invalid Password!' })
+                }
+                getTokens(user).then(tokens => {
+                    user.Authorization = tokens.Authorization
+                    user.refreshtoken = tokens.refreshtoken
+                    return res
+                        .header('refreshtoken', tokens.refreshtoken)
+                        .header('Authorization', tokens.Authorization)
+                        .json({ user })
+                })
+            })
+
+        })
     } catch (error) {
         console.error(error)
         return res.status(500).json({ error: 'Internal Server Error!' })
@@ -64,17 +98,21 @@ exports.login = async (req, res) => {
 
 exports.generateRefreshToken = async (req, res) => {
     try {
-        const { refreshToken } = req.body
-        if (!refreshToken) {
-            return res.status(403).json({ error: 'Access denied, missing token'})
+        const { refreshtoken } = req.body
+        if (!refreshtoken) {
+            return res.status(403).json({ error: 'Access denied, missing token' })
         } else {
-            const tokenDoc = await Token.findOne({ token: refreshToken })
+            const tokenDoc = await Token.findOne({ token: refreshtoken })
             if (!tokenDoc) {
                 return res.status(401).json({ error: 'Token Expired!' })
             } else {
                 const payload = jwt.verify(tokenDoc.token, REFRESH_SECRET)
-                const accessToken = jwt.sign({ user: payload }, SHARED_SECRET, { expiresIn: '10m' })
-                return res.status(200).json({ accessToken })
+                const Authorization = jwt.sign({ user: payload }, SHARED_SECRET, { expiresIn: '10m' })
+                return res
+                    .status(200)
+                    .header('refreshtoken', refreshtoken)
+                    .header('Authorization', Authorization)
+                    .json({ user })
             }
         }
     } catch (error) {
@@ -85,9 +123,9 @@ exports.generateRefreshToken = async (req, res) => {
 
 exports.logout = async (req, res) => {
     try {
-        const { refreshToken } = req.body
-        await Token.findOneAndDelete({ token: refreshToken })
-        return res.status(200).json({ success: 'User Logged Out.'})
+        const { refreshtoken } = req.body
+        await Token.findOneAndDelete({ token: refreshtoken })
+        return res.status(200).json({ success: 'User Logged Out.' })
     } catch (error) {
         console.error(error)
         return res.status(500).json({ error: 'Internal Server Error!' })
@@ -95,35 +133,35 @@ exports.logout = async (req, res) => {
 }
 
 exports.magic = async (req, res) => {
-  const { email, portal } = req.body
-  try {
-    let user = await User.findOne({ email: email })
-    if (!user) {
-        res.status(404).json({ error: 'No user found!' }) // Tell the front end to lie
-    } else {
-      let accessToken = await user.createAccessToken(300)
-      
+    const { email, portal } = req.body
+    try {
+        let user = await User.findOne({ email: email })
+        if (!user) {
+            res.status(404).json({ error: 'No user found!' }) // Tell the front end to lie
+        } else {
+            let Authorization = await user.createAuthorization(300)
 
-    const mailerSend = new MailerSend({
-      apiKey: API_KEY,
-    });
 
-    const sentFrom = new Sender(`no-reply@${SEND_DOMAIN}`, "no-reply");
+            const mailerSend = new MailerSend({
+                apiKey: API_KEY,
+            });
 
-    const recipients = [
-      new Recipient(email, `${user.firstName}`)
-    ];
+            const sentFrom = new Sender(`no-reply@${SEND_DOMAIN}`, "no-reply");
 
-    const emailParams = new EmailParams()
-      .setFrom(sentFrom)
-      .setTo(recipients)
-      .setReplyTo(sentFrom)
-      .setSubject("Magic-Link")
-      .setHtml('<strong>Here is the Magic Link you requested</strong>')
-      .setText(`https://${portal}.${SEND_DOMAIN}.com/magic?token=${accessToken}`);
+            const recipients = [
+                new Recipient(email, `${user.firstName}`)
+            ];
 
-    await mailerSend.email.send(emailParams);
-          return res.status(200).json({ })
+            const emailParams = new EmailParams()
+                .setFrom(sentFrom)
+                .setTo(recipients)
+                .setReplyTo(sentFrom)
+                .setSubject("Magic-Link")
+                .setHtml('<strong>Here is the Magic Link you requested</strong>')
+                .setText(`https://${portal}.${SEND_DOMAIN}.com/magic?token=${Authorization}`);
+
+            await mailerSend.email.send(emailParams);
+            return res.status(200).json({})
         }
     } catch (error) {
         console.error(error)

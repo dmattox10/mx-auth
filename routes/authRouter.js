@@ -6,14 +6,15 @@ const authController = require('../controllers/authController')
 const authRouter = express.Router({ mergeParams: true }) 
 const store = new ExpressBrute.MemoryStore()
 const bruteforce = new ExpressBrute(store)
+const authenticate = require('../middlewares')
 
-authRouter.post('/register', Cors(), authController.register)
+authRouter.post('/auth/register', Cors(), authController.register)
 
-authRouter.post('/login', Cors(), authController.login)
+authRouter.post('/auth/login', Cors(), authController.login)
 
-authRouter.post('/refresh', Cors(), authController.generateRefreshToken)
+authRouter.post('/auth/refresh', Cors(), authenticate, authController.generateRefreshToken)
 
-authRouter.delete('/logout', authController.logout)
+authRouter.delete('/auth/logout', Cors(), authController.logout)
 
 // authRouter.post('/app/referrer', Cors(), Middleware.checkAuth, async (req, res) => {
 //     const referrer = req.body.referrer

@@ -12,18 +12,21 @@ let usersToAdd = [
     firstName: 'John',
     lastName: 'Doe',
     password: 'password1', // Plain text password
+    appName: 'moodi'
   },
   {
     email: 'user2@example.com',
     firstName: 'Alice',
     lastName: 'Smith',
     password: 'password2', // Plain text password
+    appName: 'moodi'
   },
   {
     email: 'user3@example.com',
     firstName: 'Emma',
     lastName: 'Johnson',
     password: 'password3', // Plain text password
+    appName: 'moodi'
   }
 ]
 
