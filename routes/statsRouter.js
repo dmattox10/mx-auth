@@ -21,7 +21,7 @@ statsRouter.get('/', Cors(), bruteforce.prevent, async (req, res) => {
     res.status(200).json()
 })
 
-statsRouter.post('/app', Cors(), bruteforce.prevent, Middleware.checkAuth, async (req, res) => {
+statsRouter.post('/app', Cors(), bruteforce.prevent, Middleware.checkauth, async (req, res) => {
     const referrer = req.body.referrer
     // TODO JWT Check here!
     if (req.user) {

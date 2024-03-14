@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
             if (!user) {
                 new User(update/*, options*/).then(user => {
                     getTokens(user).then(tokens => {
-                        user.Authorization = tokens.Authorization
+                        user.auth = tokens.auth
                         user.refreshtoken = tokens.refreshtoken
                         user.save().then(newUser=> {
                             const portalFilter = { name: appName }
@@ -32,13 +32,13 @@ exports.register = async (req, res) => {
                                 return res
                                     .status(201)
                                     .header('refreshtoken', tokens.refreshtoken)
-                                    .header('Authorization', tokens.Authorization)
+                                    .header('auth', tokens.auth)
                                     .json({ user })
                             })
                         })
                     }) 
                 })
-                // return res.status(201).json({ Authorization, refreshtoken, user })
+                // return res.status(201).json({ auth, refreshtoken, user })
             } else { // catchall?
                 return res.status(400).json({ error: 'User exists' })
             }
@@ -53,8 +53,8 @@ async function getTokens(user) {
     let tokens = {}
     return new Promise((resolve, reject) => {
         try {
-            user.createAuthorization().then(Authorization => {
-                tokens.Authorization = Authorization
+            user.createauth().then(auth => {
+                tokens.auth = auth
                 user.createRefreshToken().then(refreshtoken => {
                     tokens.refreshtoken = refreshtoken
                     resolve(tokens)
@@ -73,18 +73,18 @@ exports.login = async (req, res) => {
     try {
         User.findOne({ email: email }).then(user => {
             if (!user) {
-                res.status(404).json({ error: 'No user found!' })
+                return res.status(404).json({ error: 'No user found!' })
             }
             user.validPassword(password).then(valid => {
                 if (!valid) {
                     return res.status(401).json({ error: 'Invalid Password!' })
                 }
                 getTokens(user).then(tokens => {
-                    user.Authorization = tokens.Authorization
+                    user.auth = tokens.auth
                     user.refreshtoken = tokens.refreshtoken
                     return res
                         .header('refreshtoken', tokens.refreshtoken)
-                        .header('Authorization', tokens.Authorization)
+                        .header('auth', tokens.auth)
                         .json({ user })
                 })
             })
@@ -107,11 +107,11 @@ exports.generateRefreshToken = async (req, res) => {
                 return res.status(401).json({ error: 'Token Expired!' })
             } else {
                 const payload = jwt.verify(tokenDoc.token, REFRESH_SECRET)
-                const Authorization = jwt.sign({ user: payload }, SHARED_SECRET, { expiresIn: '10m' })
+                const auth = jwt.sign({ user: payload }, SHARED_SECRET, { expiresIn: '10m' })
                 return res
                     .status(200)
                     .header('refreshtoken', refreshtoken)
-                    .header('Authorization', Authorization)
+                    .header('auth', auth)
                     .json({ user })
             }
         }
@@ -139,7 +139,7 @@ exports.magic = async (req, res) => {
         if (!user) {
             res.status(404).json({ error: 'No user found!' }) // Tell the front end to lie
         } else {
-            let Authorization = await user.createAuthorization(300)
+            let auth = await user.createauth(300)
 
 
             const mailerSend = new MailerSend({
@@ -158,7 +158,7 @@ exports.magic = async (req, res) => {
                 .setReplyTo(sentFrom)
                 .setSubject("Magic-Link")
                 .setHtml('<strong>Here is the Magic Link you requested</strong>')
-                .setText(`https://${portal}.${SEND_DOMAIN}.com/magic?token=${Authorization}`);
+                .setText(`https://${portal}.${SEND_DOMAIN}.com/magic?token=${auth}`);
 
             await mailerSend.email.send(emailParams);
             return res.status(200).json({})

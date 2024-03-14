@@ -53,7 +53,7 @@ app.use(jsonParser)
 
 app.use('/v1', urlencodedParser, authRouter)
 // app.use('/v1/users', urlencodedParser, profileRouter)
-// app.use('/v1/user/dashboard', passportConfig.isAuthenticated, dashRouter)
+// app.use('/v1/user/dashboard', passportConfig.isauthenticated, dashRouter)
 // app.use('/stats', statsRouter)
 
 app.get('/', (req, res) => {

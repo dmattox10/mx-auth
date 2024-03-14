@@ -25,9 +25,9 @@ exports.getUser = async (req, res, next) => {
 //         } else {
 //             let valid = user.validPassword(password)
 //             if (valid) {
-//                 let accessToken = await user.createAccessToken()
-//                 let refreshToken = await user.createRefreshToken()
-//                 return res.status(200).json({ accessToken, refreshToken })
+//                 let auth = await user.createAccessToken()
+//                 let refreshtoken = await user.createRefreshToken()
+//                 return res.status(200).json({ auth, refreshtoken })
 //             } else {
 //                 return res.status(401).json({ error: 'Invalid Password!'})
 //             }
@@ -40,17 +40,17 @@ exports.getUser = async (req, res, next) => {
 
 // exports.generateRefreshToken = async (req, res) => {
 //     try {
-//         const { refreshToken } = req.body
-//         if (!refreshToken) {
+//         const { refreshtoken } = req.body
+//         if (!refreshtoken) {
 //             return res.status(403).json({ error: 'Access denied, missing token'})
 //         } else {
-//             const tokenDoc = await Token.findOne({ token: refreshToken })
+//             const tokenDoc = await Token.findOne({ token: refreshtoken })
 //             if (!tokenDoc) {
 //                 return res.status(401).json({ error: 'Token Expired!' })
 //             } else {
 //                 const payload = jwt.verify(tokenDoc.token, REFRESH_SECRET)
-//                 const accessToken = jwt.sign({ user: payload }, SHARED_SECRET, { expiresIn: '10m' })
-//                 return res.status(200).json({ accessToken })
+//                 const auth = jwt.sign({ user: payload }, SHARED_SECRET, { expiresIn: '10m' })
+//                 return res.status(200).json({ auth })
 //             }
 //         }
 //     } catch (error) {
@@ -61,8 +61,8 @@ exports.getUser = async (req, res, next) => {
 
 // exports.logout = async (req, res) => {
 //     try {
-//         const { refreshToken } = req.body
-//         await Token.findOneAndDelete({ token: refreshToken })
+//         const { refreshtoken } = req.body
+//         await Token.findOneAndDelete({ token: refreshtoken })
 //         return res.status(200).json({ success: 'User Logged Out.'})
 //     } catch (error) {
 //         console.error(error)
@@ -77,7 +77,7 @@ exports.getUser = async (req, res, next) => {
 //     if (!user) {
 //         res.status(404).json({ error: 'No user found!' }) // Tell the front end to lie
 //     } else {
-//       let accessToken = await user.createAccessToken(300)
+//       let auth = await user.createAccessToken(300)
       
 
 //     const mailerSend = new MailerSend({
@@ -96,7 +96,7 @@ exports.getUser = async (req, res, next) => {
 //       .setReplyTo(sentFrom)
 //       .setSubject("Magic-Link")
 //       .setHtml('<strong>Here is the Magic Link you requested</strong>')
-//       .setText(`https://${portal}.${SEND_DOMAIN}.com/magic?token=${accessToken}`);
+//       .setText(`https://${portal}.${SEND_DOMAIN}.com/magic?token=${auth}`);
 
 //     await mailerSend.email.send(emailParams);
 //           return res.status(200).send()

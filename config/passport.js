@@ -13,10 +13,10 @@ require('dotenv').config()
 
 const User = require('../models/user')
 
-const accessTokenSecret = SHARED_SECRET || 'ThisIsNotProdDontWorryAboutIt'
+const authSecret = SHARED_SECRET || 'ThisIsNotProdDontWorryAboutIt'
 const opts = {
-    jwtFromRequest: ExtractJWT.fromAuthHeaderWithScheme('JWT'),
-    secretOrKey: accessTokenSecret
+    jwtFromRequest: ExtractJWT.fromauthHeaderWithScheme('JWT'),
+    secretOrKey: authSecret
 }
 
 // passport.serializeUser(function(user, done) {
@@ -82,11 +82,11 @@ passport.use('jwt', new JWTStrategy(opts, (jwt_payload, done) => {
 //     clientID: FACEBOOK_APP_ID,
 //     clientSecret: FACEBOOK_APP_SECRET,
 //     callbackURL: '/v1/auth/facebook/callback' // May need full URL
-// }, (accessToken, refreshToken, profile, cb) => {
+// }, (auth, refreshtoken, profile, cb) => {
 //     User.findOrCreate({
 //         'facebook.id': profile.id
 //     }, {
-//         'facebook.token': profile.token, // May need to change to 'accessToken'
+//         'facebook.token': profile.token, // May need to change to 'auth'
 //         'facebook.name': profile.name,
 //         'facebook.email': profile.email,
 //         'role': 'user',
@@ -100,11 +100,11 @@ passport.use('jwt', new JWTStrategy(opts, (jwt_payload, done) => {
 //     clientID: GITHUB_CLIENT_ID,
 //     clientSecret: GITHUB_CLIENT_SECRET,
 //     callbackURL: '/v1/auth/github/callback'
-// }, (accessToken, refreshToken, profile, done) => {
+// }, (auth, refreshtoken, profile, done) => {
 //     User.findOrCreate({
 //         'github.id': profile.id
 //     }, {
-//         'github.token': profile.token, // May need to change to 'accessToken'
+//         'github.token': profile.token, // May need to change to 'auth'
 //         'method': 'github'
 //     }, (err, user) => {
 //         return done(err, user)
@@ -115,11 +115,11 @@ passport.use('jwt', new JWTStrategy(opts, (jwt_payload, done) => {
 //     clientID: GOOGLE_CLIENT_ID,
 //     clientSecret: GOOGLE_CLIENT_SECRET,
 //     callbackURL: '/v1/auth/google/callback' // May need full URL
-// }, (accessToken, refreshToken, profile, cb) => {
+// }, (auth, refreshtoken, profile, cb) => {
 //     User.findOrCreate({
 //         'google.id': profile.id
 //     }, {
-//         'google.token': profile.token, // May need to change to 'accessToken'
+//         'google.token': profile.token, // May need to change to 'auth'
 //         'google.email': profile.email,
 //         'google.name': profile.name,
 //         'role': 'user',
@@ -137,7 +137,7 @@ passport.use('jwt', new JWTStrategy(opts, (jwt_payload, done) => {
 //     User.findOrCreate({
 //         'twitter.id': profile.id
 //     }, {
-//         'twitter.token': profile.token, // May need to change to 'accessToken'
+//         'twitter.token': profile.token, // May need to change to 'auth'
 //         'twitter.displayName': profile.displayName,
 //         'twitter.username': profile.username,
 //         'role': 'user',
@@ -147,8 +147,8 @@ passport.use('jwt', new JWTStrategy(opts, (jwt_payload, done) => {
 //     })
 // }))
 
-// exports.isAuthenticated = (req, res, next) => {
-//     if (req.isAuthenticated()) {
+// exports.isauthenticated = (req, res, next) => {
+//     if (req.isauthenticated()) {
 //       return next()
 //     }
 //     res.status(401).json('You must be logged in to do that.')

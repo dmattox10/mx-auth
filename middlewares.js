@@ -1,7 +1,7 @@
 // const jwt = require('jsonwebtoken')
 // const { SHARED_SECRET } = require('./env')
 
-// exports.checkAuth = (req, res, next) => {
+// exports.checkauth = (req, res, next) => {
 //     const token = req.get('x-auth-token')
 //     if (!token) {
 //         return res.status(401).json({ error: 'Access denied, missing token' })
@@ -27,30 +27,30 @@ const jwt = require('jsonwebtoken')
 const { SHARED_SECRET, REFRESH_SECRET } = require('./env')
 
 const authenticate = (req, res, next) => {
-    const accessToken = req.headers['Authorization']
-    const refreshToken = req.headers['refreshtoken']
+    const auth = req.headers['auth']
+    const refreshtoken = req.headers['refreshtoken']
   
-    if (!accessToken && !refreshToken) {
+    if (!auth && !refreshtoken) {
       return res.status(401).send('Access Denied. No token provided.');
     }
   
     try {
-      const decoded = jwt.verify(accessToken, SHARED_SECRET);
+      const decoded = jwt.verify(auth, SHARED_SECRET);
       req.user = decoded.user;
       next();
     } catch (error) { // NOTE I love this pattern of trying something else in the catch!
-      if (!refreshToken) {
+      if (!refreshtoken) {
         return res.status(498).send('Access Denied. No refresh token provided.');
       }
   
       try {
-        const decoded = jwt.verify(refreshToken, REFRESH_SECRET);
-        const accessToken = jwt.sign({ user: decoded.user }, SHARED_SECRET, { expiresIn: '1h' });
+        const decoded = jwt.verify(refreshtoken, REFRESH_SECRET);
+        const auth = jwt.sign({ user: decoded.user }, SHARED_SECRET, { expiresIn: '1h' });
         req.user = decoded.user
         res
           .status(307)
-          .header('refreshtoken', refreshToken)
-          .header('Authorization', accessToken)
+          .header('refreshtoken', refreshtoken)
+          .header('auth', auth)
           .send(decoded.user);
       } catch (error) {
         return res.status(400).send('Invalid Token.');

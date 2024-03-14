@@ -45,19 +45,19 @@ userSchema.pre('save', async function (next) {
 })
 
 userSchema.methods = {
-        createAuthorization: async function (time) {
+        createauth: async function (time) {
             return new Promise((resolve, reject) => {
                 try {
                     let { _id, email } = this
                     console.log(email)
-                    let Authorization = jwt.sign(
+                    let auth = jwt.sign(
                         { user: { _id, email } },
                         SHARED_SECRET,
                         {
                             expiresIn: time || "10m",
                         }
                     )
-                    resolve(Authorization)
+                    resolve(auth)
                 } catch (error) {
                     reject(error)
                 }

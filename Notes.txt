@@ -1,4 +1,4 @@
-https://stackabuse.com/authentication-and-authorization-with-jwts-in-express-js/
+https://stackabuse.com/authentication-and-auth-with-jwts-in-express-js/
 
 
 Steps (We need ansible here? Kubernetes?)
@@ -8,6 +8,6 @@ Steps (We need ansible here? Kubernetes?)
 - create docker folder in home
 - create docker-compose with swag
 - docker-compose up -d
-- BUILD MX_AUTH HERE
+- BUILD MX_auth HERE
 - replace ~/docker/swag/nginx/site-confs/default with custom version
 - restart swag

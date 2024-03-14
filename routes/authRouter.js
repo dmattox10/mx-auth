@@ -16,7 +16,7 @@ authRouter.post('/auth/refresh', Cors(), authenticate, authController.generateRe
 
 authRouter.delete('/auth/logout', Cors(), authController.logout)
 
-// authRouter.post('/app/referrer', Cors(), Middleware.checkAuth, async (req, res) => {
+// authRouter.post('/app/referrer', Cors(), Middleware.checkauth, async (req, res) => {
 //     const referrer = req.body.referrer
 //     // TODO JWT Check here!
 //     if (req.user) {
